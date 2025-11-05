@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <World>
+    <FaceSetPart name="Cuarto1" id="0">
+      <face>
+        <colour r="0.8" g="0.9" b="0.8"/>
+        <vertex>				{3.3,5,0}
+				{7.3,5,0}
+				{7.3,9,0}
+			</vertex>
+      </face>
+      <face>
+        <colour r="0.8" g="0.9" b="0.8"/>
+        <vertex>				{3.3,5,0}
+				{7.3,9,0}
+				{3.3,9,0}
+			</vertex>
+      </face>
+      <face>
+        <colour r="0.8" g="0.9" b="0.8"/>
+        <vertex>				{0,0,0}
+				{4,0,0}
+				{4,3,0}
+			</vertex>
+        <orientation>				{1.5708,0,0}
+			</orientation>
+        <position>				{3.3,5,0}
+			</position>
+      </face>
+      <face>
+        <colour r="0.8" g="0.9" b="0.8"/>
+        <vertex>				{0,0,0}
+				{4,3,0}
+				{0,3,0}
+			</vertex>
+        <orientation>				{1.5708,0,0}
+			</orientation>
+        <position>				{3.3,5,0}
+			</position>
+      </face>
+      <face>
+        <colour r="0.8" g="0.9" b="0.8"/>
+        <vertex>				{0,0,0}
+				{4,0,0}
+				{4,3,0}
+			</vertex>
+        <orientation>				{1.5708,0,0}
+			</orientation>
+        <position>				{3.3,9,0}
+			</position>
+      </face>
+      <face>
+        <colour r="0.8" g="0.9" b="0.8"/>
+        <vertex>				{0,0,0}
+				{4,3,0}
+				{0,3,0}
+			</vertex>
+        <orientation>				{1.5708,0,0}
+			</orientation>
+        <position>				{3.3,9,0}
+			</position>
+      </face>
+      <face>
+        <colour r="0.8" g="0.9" b="0.8"/>
+        <vertex>				{0,0,0}
+				{4,0,0}
+				{4,3,0}
+			</vertex>
+        <orientation>				{1.5708,0,1.5708}
+			</orientation>
+        <position>				{3.3,5,0}
+			</position>
+      </face>
+      <face>
+        <colour r="0.8" g="0.9" b="0.8"/>
+        <vertex>				{0,0,0}
+				{4,3,0}
+				{0,3,0}
+			</vertex>
+        <orientation>				{1.5708,0,1.5708}
+			</orientation>
+        <position>				{3.3,5,0}
+			</position>
+      </face>
+      <face>
+        <colour r="0.8" g="0.9" b="0.8"/>
+        <vertex>				{0,0,0}
+				{1,0,0}
+				{1,3,0}
+			</vertex>
+        <orientation>				{1.5708,0,1.5708}
+			</orientation>
+        <position>				{7.3,5,0}
+			</position>
+      </face>
+      <face>
+        <colour r="0.8" g="0.9" b="0.8"/>
+        <vertex>				{0,0,0}
+				{1,3,0}
+				{0,3,0}
+			</vertex>
+        <orientation>				{1.5708,0,1.5708}
+			</orientation>
+        <position>				{7.3,5,0}
+			</position>
+      </face>
+      <face>
+        <colour r="0.8" g="0.9" b="0.8"/>
+        <vertex>				{0,0,0}
+				{1,0,0}
+				{1,3,0}
+			</vertex>
+        <orientation>				{1.5708,0,1.5708}
+			</orientation>
+        <position>				{7.3,8,0}
+			</position>
+      </face>
+      <face>
+        <colour r="0.8" g="0.9" b="0.8"/>
+        <vertex>				{0,0,0}
+				{1,3,0}
+				{0,3,0}
+			</vertex>
+        <orientation>				{1.5708,0,1.5708}
+			</orientation>
+        <position>				{7.3,8,0}
+			</position>
+      </face>
+    </FaceSetPart>
+    <FaceSetPart name="Pasillo" id="1">
+      <face>
+        <colour r="0.9" g="0.9" b="0.7"/>
+        <vertex>				{7.3,6,0}
+				{8.3,6,0}
+				{8.3,8,0}
+			</vertex>
+      </face>
+      <face>
+        <colour r="0.9" g="0.9" b="0.7"/>
+        <vertex>				{7.3,6,0}
+				{8.3,8,0}
+				{7.3,8,0}
+			</vertex>
+      </face>
+      <face>
+        <colour r="0.9" g="0.9" b="0.7"/>
+        <vertex>				{0,0,0}
+				{1,0,0}
+				{1,3,0}
+			</vertex>
+        <orientation>				{1.5708,0,0}
+			</orientation>
+        <position>				{7.3,6,0}
+			</position>
+      </face>
+      <face>
+        <colour r="0.9" g="0.9" b="0.7"/>
+        <vertex>				{0,0,0}
+				{1,3,0}
+				{0,3,0}
+			</vertex>
+        <orientation>				{1.5708,0,0}
+			</orientation>
+        <position>				{7.3,6,0}
+			</position>
+      </face>
+      <face>
+        <colour r="0.9" g="0.9" b="0.7"/>
+        <vertex>				{0,0,0}
+				{1,0,0}
+				{1,3,0}
+			</vertex>
+        <orientation>				{1.5708,0,0}
+			</orientation>
+        <position>				{7.3,8,0}
+			</position>
+      </face>
+      <face>
+        <colour r="0.9" g="0.9" b="0.7"/>
+        <vertex>				{0,0,0}
+				{1,3,0}
+				{0,3,0}
+			</vertex>
+        <orientation>				{1.5708,0,0}
+			</orientation>
+        <position>				{7.3,8,0}
+			</position>
+      </face>
+    </FaceSetPart>
+    <FaceSetPart name="Cuarto2" id="2">
+      <face>
+        <colour r="0.8" g="0.8" b="0.9"/>
+        <vertex>				{8.3,5,0}
+				{12.3,5,0}
+				{12.3,9,0}
+			</vertex>
+      </face>
+      <face>
+        <colour r="0.8" g="0.8" b="0.9"/>
+        <vertex>				{8.3,5,0}
+				{12.3,9,0}
+				{8.3,9,0}
+			</vertex>
+      </face>
+      <face>
+        <colour r="0.8" g="0.8" b="0.9"/>
+        <vertex>				{0,0,0}
+				{4,0,0}
+				{4,3,0}
+			</vertex>
+        <orientation>				{1.5708,0,0}
+			</orientation>
+        <position>				{8.3,5,0}
+			</position>
+      </face>
+      <face>
+        <colour r="0.8" g="0.8" b="0.9"/>
+        <vertex>				{0,0,0}
+				{4,3,0}
+				{0,3,0}
+			</vertex>
+        <orientation>				{1.5708,0,0}
+			</orientation>
+        <position>				{8.3,5,0}
+			</position>
+      </face>
+      <face>
+        <colour r="0.8" g="0.8" b="0.9"/>
+        <vertex>				{0,0,0}
+				{4,0,0}
+				{4,3,0}
+			</vertex>
+        <orientation>				{1.5708,0,0}
+			</orientation>
+        <position>				{8.3,9,0}
+			</position>
+      </face>
+      <face>
+        <colour r="0.8" g="0.8" b="0.9"/>
+        <vertex>				{0,0,0}
+				{4,3,0}
+				{0,3,0}
+			</vertex>
+        <orientation>				{1.5708,0,0}
+			</orientation>
+        <position>				{8.3,9,0}
+			</position>
+      </face>
+      <face>
+        <colour r="0.8" g="0.8" b="0.9"/>
+        <vertex>				{0,0,0}
+				{4,0,0}
+				{4,3,0}
+			</vertex>
+        <orientation>				{1.5708,0,1.5708}
+			</orientation>
+        <position>				{12.3,5,0}
+			</position>
+      </face>
+      <face>
+        <colour r="0.8" g="0.8" b="0.9"/>
+        <vertex>				{0,0,0}
+				{4,3,0}
+				{0,3,0}
+			</vertex>
+        <orientation>				{1.5708,0,1.5708}
+			</orientation>
+        <position>				{12.3,5,0}
+			</position>
+      </face>
+      <face>
+        <colour r="0.8" g="0.8" b="0.9"/>
+        <vertex>				{0,0,0}
+				{1,0,0}
+				{1,3,0}
+			</vertex>
+        <orientation>				{1.5708,0,1.5708}
+			</orientation>
+        <position>				{8.3,5,0}
+			</position>
+      </face>
+      <face>
+        <colour r="0.8" g="0.8" b="0.9"/>
+        <vertex>				{0,0,0}
+				{1,3,0}
+				{0,3,0}
+			</vertex>
+        <orientation>				{1.5708,0,1.5708}
+			</orientation>
+        <position>				{8.3,5,0}
+			</position>
+      </face>
+      <face>
+        <colour r="0.8" g="0.8" b="0.9"/>
+        <vertex>				{0,0,0}
+				{1,0,0}
+				{1,3,0}
+			</vertex>
+        <orientation>				{1.5708,0,1.5708}
+			</orientation>
+        <position>				{8.3,8,0}
+			</position>
+      </face>
+      <face>
+        <colour r="0.8" g="0.8" b="0.9"/>
+        <vertex>				{0,0,0}
+				{1,3,0}
+				{0,3,0}
+			</vertex>
+        <orientation>				{1.5708,0,1.5708}
+			</orientation>
+        <position>				{8.3,8,0}
+			</position>
+      </face>
+    </FaceSetPart>
+    <Pioneer3ATSim name="Camarero" id="3">
+      <orientation>			{0,-0,1.5708}
+		</orientation>
+      <position>			{8.7,7,0}
+		</position>
+      <odometry seconds="1762371221" microseconds="919000"/>
+    </Pioneer3ATSim>
+    <LMS100Sim name="LMS100" id="4" linkTo="$Camarero$">
+      <position>			{0.1,0,0.4}
+		</position>
+      <colour r="0" g="1" b="0"/>
+    </LMS100Sim>
+    <UltrasonicSensor conusAngle="0.174533" maxRange="3" minRange="0.05" error="0" name="uc0" id="5" linkTo="$Camarero$">
+      <orientation>			{0,-0.1,0}
+		</orientation>
+      <position>			{0.2,0,0.2}
+		</position>
+      <colour r="0" g="1" b="0"/>
+    </UltrasonicSensor>
+    <UltrasonicSensor conusAngle="0.174533" maxRange="3" minRange="0.05" error="0" name="ul1" id="6" linkTo="$Camarero$">
+      <orientation>			{6.93889e-18,-0.1,0.7}
+		</orientation>
+      <position>			{0.18,0.11,0.2}
+		</position>
+      <colour r="0" g="1" b="0"/>
+    </UltrasonicSensor>
+    <UltrasonicSensor conusAngle="0.174533" maxRange="3" minRange="0.05" error="0" name="ur1" id="7" linkTo="$Camarero$">
+      <orientation>			{-6.93889e-18,-0.1,-0.7}
+		</orientation>
+      <position>			{0.18,-0.11,0.2}
+		</position>
+      <colour r="0" g="1" b="0"/>
+    </UltrasonicSensor>
+    <LandMark name="LM1" mark_id="1">
+      <position>			{12.3,5,0}
+		</position>
+    </LandMark>
+    <LandMark name="LM2" mark_id="2">
+      <position>			{8.3,8,0}
+		</position>
+    </LandMark>
+  </World>
+</root>

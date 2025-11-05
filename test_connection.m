@@ -1,4 +1,4 @@
-function ApoloSensorTestGUI
+function test_connection
 %hola
 %hola
 %hola JoseCarlos
