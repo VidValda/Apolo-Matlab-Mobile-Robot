@@ -79,14 +79,22 @@ function createPlotPanel(parentGrid, fig)
     panelGrid.ColumnWidth = {'3x', '1x'};
     
     % --- Axes for Plot ---
+    % 
+    % *** FIX (HERE): Reverted to uiaxes ***
+    % uipolaraxes is not available in all MATLAB versions.
+    % We will manually convert polar data to Cartesian (x,y) for plotting.
+    %
     ax = uiaxes(panelGrid);
+    
+    % *** FIX (AND HERE): Restored DataAspectRatio and grid ***
+    % These are important for a 1:1 Cartesian plot.
     ax.DataAspectRatio = [1 1 1];
-    title(ax, 'Polar Laser Scan');
-    grid(ax, 'on'); % This will now call the built-in grid function
+    title(ax, 'Polar Laser Scan (Cartesian View)');
+    grid(ax, 'on');
+    
     fig.UserData.Axes = ax; % Store axes handle
     
     % --- Plot Button ---
-    % Removed 'LayoutPosition' property
     uibutton(panelGrid, 'Text', 'Get Laser Scan', ...
              'ButtonPushedFcn', @(src,evt) getLaserScan(fig));
 end
@@ -104,7 +112,6 @@ function createOutputPanel(parentGrid, fig)
     fig.UserData.TextArea = ta; % Store text area handle
     
     % --- Landmark Button ---
-    % Removed 'LayoutPosition' property
     uibutton(panelGrid, 'Text', 'Get Landmarks', ...
              'ButtonPushedFcn', @(src,evt) getLaserLandmarks(fig));
 end
@@ -209,16 +216,36 @@ function getLaserScan(fig)
     try
         data = apoloGetLaserData(laserName);
         
-        % Recreate the plot logic from the 'testLaserData' example PDF
-        numReadings = length(data);
+        b = size(data);
         
-        % The PDF example uses 1.5*pi (270 degrees) for the LMS100.
-        % We will assume this is centered, from -135 to +135 degrees.
-        angles = linspace(-1.5*pi/2, 1.5*pi/2, numReadings);
+        % *** FIX 2 (HERE): Defined numReadings ***
+        % This variable was used below in logMessage but was not defined.
+        numReadings = b(2);
         
-        % Use polarplot on the GUI's axes
-        polarplot(ax, angles, data, 'b.-');
-        title(ax, 'Laser Scan');
+        if numReadings == 0
+            logMessage(fig, 'Laser Scan: No readings received.');
+            return;
+        end
+        
+        t = 1:numReadings;
+        t = t*(1.5*pi/numReadings); % Calculate angles
+        
+        % *** FIX (HERE): Convert polar (t, data) to Cartesian (x, y) ***
+        [x, y] = pol2cart(t, data);
+        
+        % This will now work because 'ax' is a uiaxes object
+        % Plot the laser scan points as blue dots
+        plot(ax, x, y, 'b.'); 
+        
+        % Add the robot's position at the center
+        hold(ax, 'on');
+        plot(ax, 0, 0, 'ro', 'MarkerFaceColor', 'r'); % Red circle for robot
+        hold(ax, 'off');
+        
+        % Ensure axes are scaled equally
+        axis(ax, 'equal');
+        
+        title(ax, 'Laser Scan (Cartesian View)');
         
         logMessage(fig, sprintf('Laser Scan: %d readings plotted.', numReadings));
         
@@ -244,7 +271,7 @@ function getLaserLandmarks(fig)
         
         for i = 1:length(data.id)
             logMessage(fig, sprintf('ID: %d, Angle: %.3f rad, Dist: %.3f m', ...
-                                   data.id(i), data.angle(i), data.distance(i)));
+                                    data.id(i), data.angle(i), data.distance(i)));
         end
         
     catch ME
