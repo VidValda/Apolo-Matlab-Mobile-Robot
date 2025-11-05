@@ -82,7 +82,7 @@
       <orientation>	{0,-0.1,0.7}    </orientation>
       <position>	{0.18,0.11,0.2}	</position>
       <colour r="0" g="1" b="0"/>
-    </UltrasonicSensor>
+    </UltrasonicSensor> 
 	
     <UltrasonicSensor name="ur1" linkTo="$Marvin$">
       <orientation>	{0,-0.1,-0.7}    </orientation>
