@@ -104,3 +104,4 @@ std_errores_d = std(errores_d);
 std_errores_a = std(errores_a);
 
 save('stats_error_motores_odometria.mat', 'var_errores_d', 'var_errores_a', 'mean_errores_d', 'mean_errores_a', 'std_errores_d', 'std_errores_a');
+saveas(gcf, 'error_analysis_figure.png');
