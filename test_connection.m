@@ -1,31 +1,20 @@
 function test_connection
-%hola
-%hola
-%hola JoseCarlos
+    % ApoloSensorTestGUI_Updated
+    % Updates:
+    % 1. Default robot name set to 'Marvin' (standard in Apolo docs).
+    % 2. apoloUpdate() added to all sensor callbacks to refresh the simulator.
 
-
-    % ApoloSensorTestGUI Creates a MATLAB GUI to test Apolo simulator sensors.
-    %
-    % This GUI provides controls to move a mobile robot and buttons to query
-    % various sensors, displaying the results in text and graphical formats.
-    %
-    % Assumes:
-    % 1. Apolo simulator is running.
-    % 2. An Apolo world is loaded (e.g., GyNRpractica1.xml from the docs).
-    % 3. The Apolo MATLAB functions are in the MATLAB path.
-    
     % --- Create Main Figure ---
-    fig = uifigure('Name', 'Apolo Sensor Tester', 'Position', [100, 100, 800, 600]);
+    fig = uifigure('Name', 'Apolo Sensor Tester (Refresh Enabled)', 'Position', [100, 100, 800, 600]);
     
     % --- Create Main Grid Layout ---
     mainGrid = uigridlayout(fig, [3, 1]);
     mainGrid.RowHeight = {'1.2x', '3x', '2x'};
     
     % --- Store Handles and Data ---
-    % We use the 'UserData' property of the figure to store shared data
-    % like object names and handles to UI components.
-    fig.UserData.robotName = 'Marvin'; % Default robot name from docs
-    fig.UserData.laserName = 'LMS100'; % Default laser name from docs
+    % Changed default from 'Elder' to 'Marvin' to match standard docs
+    fig.UserData.robotName = 'Marvin'; 
+    fig.UserData.laserName = 'LMS100'; 
     
     % --- Create UI Panels ---
     createControlPanel(mainGrid, fig);
@@ -33,9 +22,8 @@ function test_connection
     createOutputPanel(mainGrid, fig);
     
     % --- Initial Log Message ---
-    logMessage(fig, 'GUI Started. Make sure Apolo is running with a world loaded.');
+    logMessage(fig, 'GUI Started. Added apoloUpdate() to all reads.');
     logMessage(fig, 'Default Robot: ''Marvin'', Default Laser: ''LMS100''');
-
 end
 
 % =========================================================================
@@ -43,8 +31,6 @@ end
 % =========================================================================
 
 function createControlPanel(parentGrid, fig)
-    % Creates the top panel with text inputs and buttons
-    
     panel = uipanel(parentGrid, 'Title', 'Controls');
     grid = uigridlayout(panel, [3, 4]);
     grid.ColumnWidth = {'1.2x', '1x', '1x', '1x'};
@@ -67,51 +53,31 @@ function createControlPanel(parentGrid, fig)
     uibutton(grid, 'Text', 'Get Odometry', 'ButtonPushedFcn', @(src,evt) getOdometryData(fig));
     uibutton(grid, 'Text', 'Reset Odometry', 'ButtonPushedFcn', @(src,evt) resetOdometry(fig));
     uibutton(grid, 'Text', 'Get All Sonars', 'ButtonPushedFcn', @(src,evt) getAllSonars(fig));
-    
 end
 
 function createPlotPanel(parentGrid, fig)
-    % Creates the middle panel for the laser scan polar plot
-    
     panel = uipanel(parentGrid, 'Title', 'Laser Scan (apoloGetLaserData)');
-    % Rename 'grid' to 'panelGrid' to avoid conflict with the 'grid' function
     panelGrid = uigridlayout(panel, [1, 2]);
     panelGrid.ColumnWidth = {'3x', '1x'};
     
-    % --- Axes for Plot ---
-    % 
-    % *** FIX (HERE): Reverted to uiaxes ***
-    % uipolaraxes is not available in all MATLAB versions.
-    % We will manually convert polar data to Cartesian (x,y) for plotting.
-    %
     ax = uiaxes(panelGrid);
-    
-    % *** FIX (AND HERE): Restored DataAspectRatio and grid ***
-    % These are important for a 1:1 Cartesian plot.
     ax.DataAspectRatio = [1 1 1];
     title(ax, 'Polar Laser Scan (Cartesian View)');
     grid(ax, 'on');
+    fig.UserData.Axes = ax;
     
-    fig.UserData.Axes = ax; % Store axes handle
-    
-    % --- Plot Button ---
     uibutton(panelGrid, 'Text', 'Get Laser Scan', ...
              'ButtonPushedFcn', @(src,evt) getLaserScan(fig));
 end
 
 function createOutputPanel(parentGrid, fig)
-    % Creates the bottom panel for text logs
-    
     panel = uipanel(parentGrid, 'Title', 'Sensor Data Output');
-    % Rename 'grid' to 'panelGrid' to avoid conflict
     panelGrid = uigridlayout(panel, [1, 2]);
     panelGrid.ColumnWidth = {'3x', '1x'};
     
-    % --- Text Area for Logs ---
     ta = uitextarea(panelGrid, 'Editable', 'off', 'Value', {''});
-    fig.UserData.TextArea = ta; % Store text area handle
+    fig.UserData.TextArea = ta;
     
-    % --- Landmark Button ---
     uibutton(panelGrid, 'Text', 'Get Landmarks', ...
              'ButtonPushedFcn', @(src,evt) getLaserLandmarks(fig));
 end
@@ -121,14 +87,11 @@ end
 % =========================================================================
 
 function updateNames(fig)
-    % Reads the current values from the text fields and updates UserData
     fig.UserData.robotName = fig.UserData.RobotNameField.Value;
     fig.UserData.laserName = fig.UserData.LaserNameField.Value;
 end
 
 function logMessage(fig, message)
-    % Prepends a message to the text log area
-    % This ensures the newest message is always at the top
     try
         ta = fig.UserData.TextArea;
         timestamp = datestr(now, 'HH:MM:SS');
@@ -144,11 +107,10 @@ end
 % =========================================================================
 
 function moveRobot(fig, direction)
-    % Called by movement buttons
     updateNames(fig);
     robotName = fig.UserData.robotName;
     
-    % Define movement parameters [speed, rot_speed], time
+    % Standard speed settings
     speed = 0.1; % m/s
     rotSpeed = 0.2; % rad/s
     time = 0.1; % s
@@ -167,25 +129,27 @@ function moveRobot(fig, direction)
                 apoloMoveMRobot(robotName, [0, 0], time);
         end
         
-        apoloUpdate(); % Refresh the Apolo view
+        % [UPDATED] Critical for refreshing the view after movement
+        apoloUpdate(); 
         logMessage(fig, ['Move: ' direction]);
         
-        % Automatically update odometry after moving
         getOdometryData(fig); 
         
     catch ME
         logMessage(fig, ['Error moving robot: ' ME.message]);
-        logMessage(fig, 'Is Apolo running and is the robot name correct?');
     end
 end
 
 function getOdometryData(fig)
-    % Gets and displays the robot's odometry
     updateNames(fig);
     robotName = fig.UserData.robotName;
     
     try
-        pos = apoloGetOdometry(robotName); % Returns [x, y, theta]
+        pos = apoloGetOdometry(robotName);
+        
+        % [UPDATED] Refresh view after reading data
+        apoloUpdate(); 
+        
         logMessage(fig, sprintf('Odometry: X=%.3f, Y=%.3f, Theta=%.3f', pos(1), pos(2), pos(3)));
     catch ME
         logMessage(fig, ['Error getting odometry: ' ME.message]);
@@ -193,33 +157,35 @@ function getOdometryData(fig)
 end
 
 function resetOdometry(fig)
-    % Resets the robot's odometry to [0, 0, 0]
     updateNames(fig);
     robotName = fig.UserData.robotName;
     
     try
         apoloResetOdometry(robotName);
+        
+        % [UPDATED] Refresh view after reset
+        apoloUpdate(); 
+        
         logMessage(fig, 'Odometry Reset to [0, 0, 0].');
-        getOdometryData(fig); % Log the new odom value
+        getOdometryData(fig); 
     catch ME
         logMessage(fig, ['Error resetting odometry: ' ME.message]);
     end
 end
 
 function getLaserScan(fig)
-    % Gets laser data and creates a polar plot
     updateNames(fig);
     laserName = fig.UserData.laserName;
     ax = fig.UserData.Axes;
-    cla(ax); % Clear the axes
+    cla(ax);
     
     try
         data = apoloGetLaserData(laserName);
         
-        b = size(data);
+        % [UPDATED] Refresh view after heavy sensor read
+        apoloUpdate(); 
         
-        % *** FIX 2 (HERE): Defined numReadings ***
-        % This variable was used below in logMessage but was not defined.
+        b = size(data);
         numReadings = b(2);
         
         if numReadings == 0
@@ -227,41 +193,35 @@ function getLaserScan(fig)
             return;
         end
         
+        % Formula from EjemploUso.pdf
         t = 1:numReadings;
-        t = t*(1.5*pi/numReadings); % Calculate angles
+        t = t*(1.5*pi/numReadings); 
         
-        % *** FIX (HERE): Convert polar (t, data) to Cartesian (x, y) ***
         [x, y] = pol2cart(t, data);
         
-        % This will now work because 'ax' is a uiaxes object
-        % Plot the laser scan points as blue dots
         plot(ax, x, y, 'b.'); 
-        
-        % Add the robot's position at the center
         hold(ax, 'on');
-        plot(ax, 0, 0, 'ro', 'MarkerFaceColor', 'r'); % Red circle for robot
+        plot(ax, 0, 0, 'ro', 'MarkerFaceColor', 'r'); 
         hold(ax, 'off');
-        
-        % Ensure axes are scaled equally
         axis(ax, 'equal');
-        
         title(ax, 'Laser Scan (Cartesian View)');
         
         logMessage(fig, sprintf('Laser Scan: %d readings plotted.', numReadings));
         
     catch ME
         logMessage(fig, ['Error getting laser scan: ' ME.message]);
-        logMessage(fig, 'Is the laser name correct?');
     end
 end
 
 function getLaserLandmarks(fig)
-    % Gets and logs visible landmarks
     updateNames(fig);
     laserName = fig.UserData.laserName;
     
     try
         data = apoloGetLaserLandMarks(laserName);
+        
+        % [UPDATED] Refresh view after reading landmarks
+        apoloUpdate();
         
         logMessage(fig, '--- Laser Landmarks ---');
         if isempty(data.id)
@@ -280,14 +240,19 @@ function getLaserLandmarks(fig)
 end
 
 function getAllSonars(fig)
-    % Gets and logs all ultrasonic sensor readings from the robot
     updateNames(fig);
     robotName = fig.UserData.robotName;
     
     try
         readings = apoloGetAllultrasonicSensors(robotName);
+        
+        % [UPDATED] Refresh view after reading sonars
+        apoloUpdate();
+        
         logMessage(fig, '--- All Ultrasonic Sensors ---');
-        logMessage(fig, ['Readings: ' num2str(readings)]);
+        % Display nicely formatted
+        str = sprintf('%.2f  ', readings);
+        logMessage(fig, ['Readings: ' str]);
     catch ME
         logMessage(fig, ['Error getting sonars: ' ME.message]);
     end
