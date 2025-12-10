@@ -5,6 +5,8 @@ dt = 0.01;
 
 start_x = 0;
 start_y = 2;
+correction_factor = 0.02;
+sensor_y_offset = 0.1;
 
 apoloPlaceMRobot(robotName, [start_x, start_y, 0], 0);
 apoloResetOdometry(robotName, [start_x, start_y, 0]);
@@ -18,23 +20,26 @@ pos_absolute_past = pos_absolute_current;
 pos_odometry_current = [pos_absolute_current(1),pos_absolute_current(2),pos_absolute_current(4)];
 pos_odometry_past = pos_odometry_current;
 
+x_real_sensor=sensor_y_offset*cos(pos_absolute_current(4))+pos_absolute_current(1);
+y_real_sensor=sensor_y_offset*sin(pos_absolute_current(4))+pos_absolute_current(2);
+
 angle_beacons_absolute = [
-    atan2(beacon_1_pos(2)-pos_absolute_current(2),beacon_1_pos(1)-pos_absolute_current(1))-pos_absolute_current(4)
-    atan2(beacon_2_pos(2)-pos_absolute_current(2),beacon_2_pos(1)-pos_absolute_current(1))-pos_absolute_current(4)
+    atan2(beacon_1_pos(2)-y_real_sensor,beacon_1_pos(1)-x_real_sensor)-pos_absolute_current(4)
+    atan2(beacon_2_pos(2)-y_real_sensor,beacon_2_pos(1)-x_real_sensor)-pos_absolute_current(4)
 ];
 angle_beacons_measure =angle_beacons_absolute;
 distance_beacons_absolute = [
-    sqrt((beacon_1_pos(2)-pos_absolute_current(2))^2+(beacon_1_pos(1)-pos_absolute_current(1))^2)
-    sqrt((beacon_2_pos(2)-pos_absolute_current(2))^2+(beacon_2_pos(1)-pos_absolute_current(1))^2)
+    sqrt((beacon_1_pos(2)-y_real_sensor)^2+(beacon_1_pos(1)-x_real_sensor)^2)
+    sqrt((beacon_2_pos(2)-y_real_sensor)^2+(beacon_2_pos(1)-x_real_sensor)^2)
 ]; 
 distance_beacons_measure = distance_beacons_absolute;
 
 radio = 2;
-vueltas = 2;
+vueltas = 0.2;
 distanciatotal = 2*pi*radio;
 velocidadL = 0.1;
 numerodepasos = ceil(distanciatotal/(velocidadL*dt));
-velocidadA = 2*pi/(numerodepasos*dt);
+velocidadA = -2*pi/(numerodepasos*dt);
 
 figure;
 ax1 = subplot(4,2,1);
@@ -77,7 +82,7 @@ title('Histogram distancia beacon 1');
 grid on;
 h8 = histogram('FaceColor', 'b', 'BinMethod', 'auto');
 
-total_steps = numerodepasos * vueltas;
+total_steps = ceil(numerodepasos * vueltas);
 
 errores_d = [];
 errores_a = [];
@@ -110,10 +115,12 @@ for i = 0:total_steps
 
     beacons_reading = apoloGetLaserLandMarks('LMS100');
 
+    x_real_sensor=sensor_y_offset*cos(theta_real_current)+x_real_current;
+    y_real_sensor=sensor_y_offset*sin(theta_real_current)+y_real_current;
 
     angle_beacons_absolute = [
-        atan2(beacon_1_pos(2)-y_real_current,beacon_1_pos(1)-x_real_current)-theta_real_current
-        atan2(beacon_2_pos(2)-y_real_current,beacon_2_pos(1)-x_real_current)-theta_real_current
+        atan2(beacon_1_pos(2)-y_real_sensor,beacon_1_pos(1)-x_real_sensor)-theta_real_current
+        atan2(beacon_2_pos(2)-y_real_sensor,beacon_2_pos(1)-x_real_sensor)-theta_real_current
     ];
 
     for j = 1:length(beacons_reading.id)
@@ -122,17 +129,22 @@ for i = 0:total_steps
     end
 
     distance_beacons_absolute = [
-        sqrt((beacon_1_pos(2)-y_real_current)^2+(beacon_1_pos(1)-x_real_current)^2)
-        sqrt((beacon_2_pos(2)-y_real_current)^2+(beacon_2_pos(1)-x_real_current)^2)
+        sqrt((beacon_1_pos(2)-y_real_sensor)^2+(beacon_1_pos(1)-x_real_sensor)^2)
+        sqrt((beacon_2_pos(2)-y_real_sensor)^2+(beacon_2_pos(1)-x_real_sensor)^2)
     ]; 
     for j = 1:length(beacons_reading.id)
         index = beacons_reading.id(j);
-        distance_beacons_measure(index) = beacons_reading.distance(j);
+        lectura_cruda = beacons_reading.distance;
+        bias_estimado = correction_factor / lectura_cruda;
+        distance_beacons_measure(index) = lectura_cruda-bias_estimado;
     end
 
     odometry_d_real = sqrt((x_real_current - x_real_past)^2 + (y_real_current - y_real_past)^2);
     diff_real = theta_real_current - theta_real_past;
     odometry_a_real = mod(diff_real + pi, 2*pi) - pi;
+
+    angle_beacons_absolute = mod(angle_beacons_absolute + pi, 2*pi) - pi;
+    angle_beacons_measure = mod(angle_beacons_measure + pi, 2*pi) - pi;
 
     error_d = odometry_d_real - odometry_d;
     error_theta = odometry_a_real - odometry_a;
@@ -160,13 +172,27 @@ for i = 0:total_steps
     
     drawnow limitrate;
 end
-% var_errores_d = var(errores_d);
-% var_errores_a = var(errores_a);
-% 
-% mean_errores_d = mean(errores_d);
-% mean_errores_a = mean(errores_a);
-% std_errores_d = std(errores_d);
-% std_errores_a = std(errores_a);
-% 
-% save('stats_error_motores_odometria.mat', 'var_errores_d', 'var_errores_a', 'mean_errores_d', 'mean_errores_a', 'std_errores_d', 'std_errores_a');
-% saveas(gcf, 'error_analysis_figure.png');
+var_errores_locomocion_d = var(errores_d);
+var_errores_locomocion_a = var(errores_a);
+var_errores_beacon_d = var(errores_distancia);
+var_errores_beacon_a = var(errores_angulos);
+
+mean_errores_locomocion_d = mean(errores_d);
+mean_errores_locomocion_a = mean(errores_a);
+mean_errores_beacon_d = mean(errores_distancia);
+mean_errores_beacon_a = mean(errores_angulos);
+
+std_errores_locomocion_d = std(errores_d);
+std_errores_locomocion_a = std(errores_a);
+std_errores_beacon_d = std(errores_distancia);
+std_errores_beacon_a = std(errores_angulos);
+
+save('stats_error_motores_odometria.mat', ...
+    'var_errores_locomocion_d', 'var_errores_locomocion_a', ...
+    'mean_errores_locomocion_d', 'mean_errores_locomocion_a', ...
+    'std_errores_locomocion_d', 'std_errores_locomocion_a', ...
+    'var_errores_beacon_d', 'var_errores_beacon_a', ...
+    'mean_errores_beacon_d', 'mean_errores_beacon_a', ...
+    'std_errores_beacon_d', 'std_errores_beacon_a', ...
+    'correction_factor');
+saveas(gcf, 'error_analysis_figure.png');
