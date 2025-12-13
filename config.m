@@ -6,10 +6,12 @@ laserName = 'LMS100';
 
 goal_poses = [
     2,  0,  0;
-    3,  -2,  pi/2;
-    3,  -3, pi/2;
-    0,  -2, pi
+    3,  2,  pi/2;
+    3,  3, pi/2;
+    0,  2, pi
 ];
+
+sensor_y_offset = 0.1;
 
 map = generate_map();
 
@@ -43,10 +45,9 @@ end
 
 switch ESTIMATOR_TYPE
     case 'EKF'
-        estimator_params.Q = diag([0.1, 0.1, 0.05]);
-        estimator_params.R = diag([0.5, 0.5, 0.1]);
-        estimator_params.P = eye(3);
-        estimator_params.x_true = [0; 0; 0];
+        estimator_params.Q = diag([10, 10, 10]);
+        estimator_params.R = diag([0.01,0.01]);
+        estimator_params.sensor_y_offset = sensor_y_offset;
         f_estimator = @ekf;
 end
 

@@ -3,7 +3,7 @@ function [ref_out, path_concat] = mission_planner(planner_func, map, start, goal
     full_path_y = [];
     current_start = start(1:2);
     
-    avg_speed = 0.5; 
+    avg_speed = 0.3; 
 
     for i = 1:size(goals, 1)
         current_goal = goals(i, 1:2)';
