@@ -45,7 +45,7 @@ end
 
 switch ESTIMATOR_TYPE
     case 'EKF'
-        estimator_params.Q = diag([10, 10, 10]);
+        estimator_params.Q = diag([1,1]);
         estimator_params.R = diag([0.01,0.01]);
         estimator_params.sensor_y_offset = sensor_y_offset;
         f_estimator = @ekf;

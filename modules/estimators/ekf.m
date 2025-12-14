@@ -2,23 +2,36 @@ function [x_est,P] = ekf(x_est_prev, u, z, beacons_xy, P, dt, params)
 
     v = u(1);
     w = u(2);
+    theta = x_est_prev(3);
 
     epsilon = 1e-6; 
     if (abs(w) > epsilon)
         turn_radius = v/w;
+        sin_th = sin(theta);
+        cos_th = cos(theta);
+        sin_th_wdt = sin(theta + w*dt);
+        cos_th_wdt = cos(theta + w*dt);
+
         x_apriori = [
-            x_est_prev(1) + turn_radius * (sin(x_est_prev(3)+w*dt)-sin(x_est_prev(3)));
-            x_est_prev(2) - turn_radius * (cos(x_est_prev(3)+w*dt)-cos(x_est_prev(3)));
-            x_est_prev(3) + w*dt;
+            x_est_prev(1) + turn_radius * (sin_th_wdt - sin_th);
+            x_est_prev(2) - turn_radius * (cos_th_wdt - cos_th);
+            theta + w*dt;
         ];        
-        d_dx_dtheta = (v/w) * (cos(x_est_prev(3) + w*dt) - cos(x_est_prev(3)));
-        d_dy_dtheta = (v/w) * (sin(x_est_prev(3) + w*dt) - sin(x_est_prev(3)));
+        d_dx_dtheta = (v/w) * (cos_th_wdt - cos_th);
+        d_dy_dtheta = (v/w) * (sin_th_wdt - sin_th);
         F_k = [
             1, 0, d_dx_dtheta;
             0, 1, d_dy_dtheta;
             0, 0, 1
         ];
+        L_k = [
+             (sin_th_wdt - sin_th)/w,  (v/(w^2))*(sin_th - sin_th_wdt) + (v/w)*dt*cos_th_wdt;
+            -(cos_th_wdt - cos_th)/w, -(v/(w^2))*(cos_th - cos_th_wdt) + (v/w)*dt*sin_th_wdt;
+             0,                        dt
+        ];
     else
+        c_th = cos(theta);
+        s_th = sin(theta);
         x_apriori = [
             x_est_prev(1) + v*cos(x_est_prev(3))*dt;
             x_est_prev(2) + v*sin(x_est_prev(3))*dt;
@@ -29,10 +42,17 @@ function [x_est,P] = ekf(x_est_prev, u, z, beacons_xy, P, dt, params)
             0, 1,  v * dt * cos( x_est_prev(3));
             0, 0,  1
         ];
+        L_k = [
+            c_th * dt, 0;
+            s_th * dt, 0;
+            0,         dt
+        ];
     end
 
+    
 
-    P = F_k * P * F_k' + params.Q;
+
+    P = F_k * P * F_k' + L_k*params.Q*L_k';
 
     x_a = x_apriori(1);
     y_a = x_apriori(2);
@@ -63,7 +83,11 @@ function [x_est,P] = ekf(x_est_prev, u, z, beacons_xy, P, dt, params)
     end
 
 
-    y_k = z-z_k_pred;
+    y_k = z - z_k_pred;
+
+    for i = 2:2:length(y_k)
+        y_k(i) = atan2(sin(y_k(i)), cos(y_k(i))); 
+    end
 
     m_beacon = size(params.R, 1);
     N_beacons = size(z, 1) / m_beacon;
