@@ -1,7 +1,7 @@
 clear; clc; close all;
 
 robotName = 'Marvin';
-dt = 0.01;
+dt = 0.1;
 
 start_x = 0;
 start_y = 2;
@@ -13,7 +13,7 @@ apoloResetOdometry(robotName, [start_x, start_y, 0]);
 apoloUpdate();
 
 beacon_1_pos = [-3.9,3.9];
-beacon_2_pos = [3.9,3.9];
+beacon_2_pos = [0,0];
 
 pos_absolute_current = apoloGetLocationMRobot(robotName);
 pos_absolute_past = pos_absolute_current;
@@ -35,7 +35,7 @@ distance_beacons_absolute = [
 distance_beacons_measure = distance_beacons_absolute;
 
 radio = 2;
-vueltas = 0.2;
+vueltas = 1;
 distanciatotal = 2*pi*radio;
 velocidadL = 0.1;
 numerodepasos = ceil(distanciatotal/(velocidadL*dt));
@@ -134,7 +134,7 @@ for i = 0:total_steps
     ]; 
     for j = 1:length(beacons_reading.id)
         index = beacons_reading.id(j);
-        lectura_cruda = beacons_reading.distance;
+        lectura_cruda = beacons_reading.distance(j);;
         bias_estimado = correction_factor / lectura_cruda;
         distance_beacons_measure(index) = lectura_cruda-bias_estimado;
     end
