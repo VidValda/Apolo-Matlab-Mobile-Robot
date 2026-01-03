@@ -43,8 +43,8 @@ function u = ctrl_reactive(u_nom, laser_ranges, params)
     d_right = safeQuantile(r, right,        0.10, params.range_max);
 
     % ============================================================
-    % 0) ESCAPE: mantener giro por varios pasos
-    % ============================================================
+    % 0 ESCAPE mantener giro por varios pasos
+ 
     if escape_count > 0
         escape_count = escape_count - 1;
 
@@ -63,8 +63,8 @@ function u = ctrl_reactive(u_nom, laser_ranges, params)
     end
 
     % ============================================================
-    % 1) Emergencia: activar escape si frente demasiado cerca
-    % ============================================================
+    % 1 Emergencia DE activar escape si frente demasiado cerca
+ 
     if d_front <= params.d_min
         % elegir el lado más libre (robusto)
         if d_left > d_right
@@ -89,8 +89,8 @@ function u = ctrl_reactive(u_nom, laser_ranges, params)
     end
 
     % ============================================================
-    % 2) Frenado suave: reduce v si te acercas al obstáculo frontal
-    % ============================================================
+    % 2) Frenado suave que reduce v si te acercas al obstáculo frontal
+    
     if d_front < params.d_slow
         alpha = (d_front - params.d_min) / max(params.d_slow - params.d_min, 1e-6);
         alpha = clamp(alpha, 0, 1);
@@ -102,9 +102,9 @@ function u = ctrl_reactive(u_nom, laser_ranges, params)
     end
 
     % ============================================================
-    % 3) Evasión suave: SOLO si estás relativamente cerca
+    % 3) Evasión suave SOLO si estás relativamente cerca
     %    + histeresis de lado para evitar zig-zag
-    % ============================================================
+    
     near = (d_front < params.d_slow) || (min(d_left, d_right) < params.d_slow);
 
     if pref_timer > 0
@@ -157,3 +157,4 @@ end
 function y = clamp(x,a,b)
     y = min(max(x,a),b);
 end
+
