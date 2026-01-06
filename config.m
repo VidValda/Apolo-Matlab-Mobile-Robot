@@ -1,4 +1,4 @@
-dt = 0.1;
+dt = 0.2;
 T_max = 40;
 
 robotName = 'Marvin';
@@ -25,7 +25,7 @@ planner_params.hold_time = 10;   % segundos de espera en cada goal (entre segmen
 Xmax = 40; 
 Ymax = 20;
 
-S = load('models/Factory_Map_2026_G1.mat'); % Cargar mapa de /model
+S = load('models/Factory_map_two_cone.mat'); % Cargar mapa de /model
 fn = fieldnames(S);
 bin = S.(fn{1});
 
@@ -134,8 +134,31 @@ end
 switch SENSOR_TYPE
     case 'BEACONS'
         sensor_params.beacons_pos = [
-           -3.9, 3.9;
-            3.9, 3.9;
+            6.00,  7.00;
+            8.60, 11.00;
+            12.00, 9.80;
+            16.00, 7.00;
+            7.05,  8.55;
+            15.30, 2.15;
+            16.05, 15.65;
+            24.00, 9.65;
+            16.00, 12.00;
+            24.15, 12.00;
+            25.00, 15.65;
+            29.00, 9.00;
+            35.00, 10.00;
+            24.65, 7.25;
+            34.80, 7.25;
+            35.50, 12.10;
+            15.35, 4.95;
+            25.35, 4.95;
+            25.00, 2.15;
+            35.00, 4.25;
+            35.00, 2.35;
+            3.75,  12.00;
+            3.20,  18.10;
+            36.20, 17.45;
+            32.10, 17.65
         ];
         sensor_params.correction_factor = 0.02;
         f_sensors = @beacons_sensor;

@@ -3,7 +3,7 @@ function [ref_out, path_concat] = mission_planner(planner_func, map, start, goal
     hold_time = 0;
     if isfield(p_params,'hold_time'); hold_time = p_params.hold_time; end
 
-    avg_speed = 0.3;   % igual que ya tenías
+    avg_speed = 0.5;
 
     full_path_x = [];
     full_path_y = [];
