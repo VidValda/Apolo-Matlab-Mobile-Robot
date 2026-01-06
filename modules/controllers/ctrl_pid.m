@@ -31,6 +31,17 @@ function u = ctrl_pid(x_curr, ref_state, params)
     % 
     % v_cmd = max(min(v_cmd, v_max), -v_max);
     % w_cmd = max(min(w_cmd, w_max), -w_max);
+    % frenar cuando el error angular es grande
+    if abs(e_th) > 0.6      % ~35 grados
+        v_cmd = 0.3 * v_cmd;
+    end
+    
+    % frenar cerca del punto
+    d = hypot(dx, dy);
+    if d < 0.8
+        v_cmd = v_cmd * (d / 0.8);
+    end
+
 
     u = [v_cmd; w_cmd];
 end

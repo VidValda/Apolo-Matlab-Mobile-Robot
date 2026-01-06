@@ -2,17 +2,19 @@ close all; clear; clc;
 addpath(genpath('modules'));
 addpath('utils');
 run('config.m');
-apoloPlaceMRobot(robotName, [0, 0, 0.2], 0);
-apoloResetOdometry(robotName, [0, 0, 0]);
+apoloPlaceMRobot(robotName, [5, 6, 0.2], 0);
+apoloResetOdometry(robotName, [5, 6, 0]);
 apoloUpdate();
 last_odo = apoloGetOdometry(robotName);
 
-x_est = [0; 0; 0];
+x_est = [5; 6; 0];     % <- igual que apoloResetOdometry
+
 P = diag([0.001,0.001,0.001]);
 [ref_data, full_path_xy] = mission_planner(f_planner, map, x_est, goal_poses, planner_params, dt);
 N_steps = length(ref_data.time);
 
-viz = init_visualizer(map, full_path_xy);
+viz = init_visualizer(map, full_path_xy, 40, 20);
+
 vis_step = 5;
 
 history.x_est = zeros(3, N_steps);
@@ -20,23 +22,42 @@ history.x_true = zeros(3, N_steps);
 history.sigma = zeros(3, N_steps);
 history.time = ref_data.time;
 
+
+
 for k = 1:N_steps
 
     ref_state.x  = ref_data.x(k);
     ref_state.y  = ref_data.y(k);
     ref_state.th = ref_data.th(k);
-        
-    u = f_controller(x_est, ref_state, controller_params);
-    
-    f_robot(robotName,u, dt);
+
+    % 1) Leer laser para obstáculos (scan completo)
+    laser_ranges = apoloGetLaserData(laserName);
+
+    % 2) Leer beacons para EKF (si quieres mantenerlo)
+    [z,beacons_xy] = f_sensors(laserName, sensor_params);
+
+    % 3) Control nominal (PID)
+    u_nom = f_controller(x_est, ref_state, controller_params);
+
+    % 4) Capa reactiva (evita obstáculos "de la nada")
+    u = ctrl_reactive(u_nom, laser_ranges, reactive_params);
+
+
+    if mod(k,10)==0
+        fprintf("k=%d  u_nom=[%.2f %.2f]  u=[%.2f %.2f]  minRange=%.2f\n", ...
+            k, u_nom(1), u_nom(2), u(1), u(2), min(laser_ranges));
+    end
+
+    % 5) Mover robot
+    f_robot(robotName, u, dt);
+
+    % 6) Odometría y EKF
     [u_odometry, curr_odo] = odometry(robotName, last_odo, dt);
     last_odo = curr_odo;
-    
-    abs_pos = apoloGetLocationMRobot(robotName); %GROUD-TRUTH; JUST FOR GRAPHS
-    x_true = [abs_pos(1); abs_pos(2); abs_pos(4)]; %GROUD-TRUTH; JUST FOR GRAPHS
-    
-    [z,beacons_xy] = f_sensors(laserName,sensor_params);
-    
+
+    abs_pos = apoloGetLocationMRobot(robotName);
+    x_true = [abs_pos(1); abs_pos(2); abs_pos(4)];
+
     [x_est, P] = f_estimator(x_est, u_odometry, z, beacons_xy, P, dt, estimator_params);
     
     history.x_est(:, k) = x_est;

@@ -1,118 +1,200 @@
 function path = a_star(map, start_pose, goal_pose, params)
-    res = params.resolution;
-    [rows, cols] = size(map);
-    
-    safety_margin = 0; 
 
-    offset_x = (cols * res) / 2;
-    offset_y = (rows * res) / 2;
+    [rows, cols] = size(map);
+
+    resX = params.Xmax/(rows-1);
+    resY = params.Ymax/(cols-1);
+    res = min(resX, resY);
     
-    s_col = ceil((start_pose(1) + offset_x) / res);
-    g_col = ceil((goal_pose(1) + offset_x) / res);
-    s_row = rows - ceil((start_pose(2) + offset_y) / res) + 1;
-    g_row = rows - ceil((goal_pose(2) + offset_y) / res) + 1;
+    world2grid = @(x,y) deal( ...
+        max(1, min(rows, 1 + floor(x/resX))), ...
+        max(1, min(cols, 1 + floor((params.Ymax - y)/resY))) );
     
-    s_col = max(1, min(s_col, cols)); s_row = max(1, min(s_row, rows));
-    g_col = max(1, min(g_col, cols)); g_row = max(1, min(g_row, rows));
-    
+    grid2world = @(row,col) deal( ...
+        (row-1)*resX, ...
+        params.Ymax - (col-1)*resY );
+
+
+    sx = double(start_pose(1)); sy = double(start_pose(2));
+    gx = double(goal_pose(1));  gy = double(goal_pose(2));
+
+    [s_row, s_col] = world2grid(sx,sy);
+    [g_row, g_col] = world2grid(gx,gy);
+
     start_idx = sub2ind([rows, cols], s_row, s_col);
     goal_idx  = sub2ind([rows, cols], g_row, g_col);
 
-    safe_map = map;
-    if safety_margin > 0
-        [obs_r, obs_c] = find(map == 0);
-        for i = 1:length(obs_r)
-            r_min = max(1, obs_r(i) - safety_margin);
-            r_max = min(rows, obs_r(i) + safety_margin);
-            c_min = max(1, obs_c(i) - safety_margin);
-            c_max = min(cols, obs_c(i) + safety_margin);
-            safe_map(r_min:r_max, c_min:c_max) = 0;
-        end
+    if map(start_idx)==0 || map(goal_idx)==0
+        path = []; return;
     end
+
+    % ===== Inflado duro + costmap suave (RUTH5) =====
+    occ     = (map == 0);
+
+    dist_px = bwdist(occ);
+    dist_m  = dist_px * min(resX,resY);   % metros conservador
     
-    if safe_map(start_idx) == 0 && map(start_idx) == 1
-        safe_map(start_idx) = 1; 
-    end
-    if safe_map(goal_idx) == 0 && map(goal_idx) == 1
-        safe_map(goal_idx) = 1;
-    end
-
-    if safe_map(start_idx) == 0 
-        warning('Start maps to obstacle (or safety zone)'); path = []; return;
-    end
-    if safe_map(goal_idx) == 0
-        warning('Goal maps to obstacle (or safety zone)'); path = []; return;
-    end
-
-    g_score = inf(rows, cols); f_score = inf(rows, cols);
-    parent = zeros(rows, cols);
-    g_score(start_idx) = 0;
-    f_score(start_idx) = sqrt((s_col - g_col)^2 + (s_row - g_row)^2);
+    inf_r = params.lethal_radius;
+    gain  = params.cost_gain;
+    maxit = params.max_iterations;
     
-    open_set = [start_idx];
-    offsets = [0 1 1; 0 -1 1; 1 0 1; -1 0 1; 1 1 1.41; 1 -1 1.41; -1 1 1.41; -1 -1 1.41];
+    decay = 0.4;
+    
+    inflate_px = max(1, ceil(inf_r / min(resX,resY)));
+    occ_inf = imdilate(occ, strel('disk', inflate_px, 0));
+    
+    costMap = 1 + gain * exp(-dist_m / decay);
+    costMap(occ_inf) = Inf;
 
-    path_found = false;
-    while ~isempty(open_set)
-        [~, min_k] = min(f_score(open_set));
-        current_idx = open_set(min_k);
-        
-        if current_idx == goal_idx
-            path_found = true; break;
+   
+
+
+
+
+
+    fprintf("START grid=(r=%d,c=%d), GOAL grid=(r=%d,c=%d)\n", s_row, s_col, g_row, g_col);
+    fprintf("Lethal radius: %.2f, Cost gain: %.1f\n", inf_r, gain);
+
+    % --- Reubicar solo si caen en inflado ---
+    if occ_inf(s_row,s_col)
+        [s_row, s_col] = nearestFreeCell(s_row, s_col, occ_inf);
+    end
+    if occ_inf(g_row,g_col)
+        [g_row, g_col] = nearestFreeCell(g_row, g_col, occ_inf);
+    end
+
+    start_idx = sub2ind([rows, cols], s_row, s_col);
+    goal_idx  = sub2ind([rows, cols], g_row, g_col);
+
+    fprintf("Inflated cells: %d / %d\n", nnz(occ_inf), numel(occ_inf));
+
+    % --- Chequeo conectividad ---
+    free = ~occ_inf;
+    CC = bwlabel(free, 8);
+    if CC(s_row,s_col)==0 || CC(g_row,g_col)==0 || CC(s_row,s_col) ~= CC(g_row,g_col)
+        fprintf("No hay conectividad con este inflado (start y goal en componentes distintas)\n");
+        path = [];
+        return;
+    end
+
+    % ===== A* =====
+    g = inf(rows, cols);
+    f = inf(rows, cols);
+    parent = zeros(rows, cols, 'uint32');
+    closed = false(rows, cols);
+    open_mask = false(rows, cols);
+    
+    g(start_idx) = 0;
+    w = 1.2; % weighted A*
+    f(start_idx) = w*hypot(double(s_row-g_row), double(s_col-g_col));
+    
+    neigh = [0 1 1; 0 -1 1; 1 0 1; -1 0 1; 1 1 1.4142; 1 -1 1.4142; -1 1 1.4142; -1 -1 1.4142];
+    
+    open_cap = 200000;                 % capacidad inicial (200k)
+    open_list = zeros(open_cap,1,'uint32');
+
+    open_count = 1;
+    open_list(1) = uint32(start_idx);
+    open_mask(start_idx) = true;
+    
+    iter = 0;
+    found = false;
+    
+    while open_count > 0
+        iter = iter + 1;
+        if iter > maxit
+            fprintf("A*: alcanzó max_iterations=%d\n", maxit);
+            break;
         end
+    
+        % mínimo f SOLO dentro de open_list (vector)
+        % más rápido: solo mira esa porción (sin crear cur_candidates)
+        vals = f(open_list(1:open_count));
+        [~,kmin] = min(vals);
+
+        current = open_list(kmin);
         
-        open_set(min_k) = [];
-        [cy, cx] = ind2sub([rows, cols], current_idx);
-        
-        for k = 1:8
-            ny = cy + offsets(k,1);
-            nx = cx + offsets(k,2);
-            
-            if ny > 0 && ny <= rows && nx > 0 && nx <= cols && safe_map(ny, nx) == 1
-                
-                is_diagonal = (offsets(k,1) ~= 0) && (offsets(k,2) ~= 0);
-                if is_diagonal
-                    if map(cy, nx) == 0 || map(ny, cx) == 0
-                        continue; 
+        % "remove" sin costo: swap con el último
+        open_list(kmin) = open_list(open_count);
+        open_count = open_count - 1;
+        open_mask(current) = false;
+    
+        if closed(current)
+            continue;
+        end
+    
+        if current == goal_idx
+            found = true;
+            break;
+        end
+    
+        closed(current) = true;
+    
+        [cy,cx] = ind2sub([rows, cols], double(current));
+    
+        for i = 1:8
+            ny = cy + neigh(i,1); nx = cx + neigh(i,2);
+            if ny<1||ny>rows||nx<1||nx>cols, continue; end
+            if occ_inf(ny,nx), continue; end
+    
+            nidx = sub2ind([rows, cols], ny, nx);
+            if closed(nidx), continue; end
+    
+            tentative_g = g(current) + neigh(i,3) * costMap(nidx);
+    
+            if tentative_g < g(nidx)
+                g(nidx) = tentative_g;
+                f(nidx) = tentative_g + w*hypot(double(ny-g_row), double(nx-g_col));
+                parent(nidx) = uint32(current);
+    
+                if ~open_mask(nidx)
+                    open_count = open_count + 1;
+                    if open_count > numel(open_list)
+                        % si se llenó, expandimos (raro si maxit razonable)
+                        open_list = [open_list; zeros(numel(open_list),1,'uint32')]; %#ok<AGROW>
                     end
-                end
-                
-                neighbor_idx = sub2ind([rows, cols], ny, nx);
-                tentative_g = g_score(current_idx) + offsets(k,3);
-                
-                if tentative_g < g_score(neighbor_idx)
-                    parent(neighbor_idx) = current_idx;
-                    g_score(neighbor_idx) = tentative_g;
-                    f_score(neighbor_idx) = tentative_g + sqrt((nx - g_col)^2 + (ny - g_row)^2);
-                    
-                    if ~any(open_set == neighbor_idx)
-                        open_set(end+1) = neighbor_idx;
-                    end
+                    open_list(open_count) = uint32(nidx);
+                    open_mask(nidx) = true;
                 end
             end
         end
+
+        if mod(iter,50000)==0
+            fprintf("iter=%d open=%d g=%.1f\n", iter, open_count, g(current));
+        end
+
     end
+
+
     
-    if path_found
-        path = reconstruct_path(parent, goal_idx, rows, cols, res, offset_x, offset_y);
-    else
-        path = [];
+    
+
+
+
+    if ~found, path = []; return; end
+
+    % --- Reconstrucción ---
+    idx_path = double(goal_idx); 
+    cur = double(goal_idx);
+    start_idx = double(start_idx);  % para comparar limpio
+
+    while cur ~= start_idx
+        cur = double(parent(cur));
+        if cur == 0, path = []; return; end
+        idx_path = [cur; idx_path];
+    end
+
+    [pr, pc] = ind2sub([rows, cols], idx_path);
+    path = zeros(numel(pr), 2);
+    for k = 1:numel(pr)
+        [path(k,1), path(k,2)] = grid2world(pr(k), pc(k));
     end
 end
 
-function path = reconstruct_path(parent, current_idx, rows, cols, res, off_x, off_y)
-    path_indices = [current_idx];
-    while parent(current_idx) ~= 0
-        current_idx = parent(current_idx);
-        path_indices = [current_idx, path_indices];
-    end
-    
-    [py, px] = ind2sub([rows, cols], path_indices');
-    
-    wx = (px * res) - off_x;
-    
-    flipped_py = rows - py + 1; 
-    wy = (flipped_py * res) - off_y;
-    
-    path = [wx, wy];
+function [rr, cc] = nearestFreeCell(r, c, occ_inf)
+    free = ~occ_inf;
+    if free(r,c), rr=r; cc=c; return; end
+    [R,C] = find(free);
+    [~,k] = min((R-r).^2 + (C-c).^2);
+    rr = R(k); cc = C(k);
 end
