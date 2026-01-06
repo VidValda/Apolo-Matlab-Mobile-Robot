@@ -25,7 +25,7 @@ planner_params.hold_time = 10;   % segundos de espera en cada goal (entre segmen
 Xmax = 40; 
 Ymax = 20;
 
-S = load('OFI.mat'); %BINMAP2 binmap3 OFI
+S = load('models/Factory_Map_2026_G1.mat'); % Cargar mapa de /model
 fn = fieldnames(S);
 bin = S.(fn{1});
 
