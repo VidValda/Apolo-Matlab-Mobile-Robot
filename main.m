@@ -7,9 +7,9 @@ apoloResetOdometry(robotName, [5, 6, 0]);
 apoloUpdate();
 last_odo = apoloGetOdometry(robotName);
 
-x_est = [5; 6; 0];    
+x_est = [4; 5; 0.1];%estimación inicial desfasada
 
-P = diag([0.001,0.001,0.001]);
+P = diag([0.2,0.2,0.1]);
 [ref_data, full_path_xy] = mission_planner(f_planner, map, x_est, goal_poses, planner_params, dt);
 N_steps = length(ref_data.time);
 
@@ -56,7 +56,7 @@ for k = 1:N_steps
     last_odo = curr_odo;
 
     abs_pos = apoloGetLocationMRobot(robotName);
-    x_true = [abs_pos(1); abs_pos(2); abs_pos(4)];
+    x_true = [abs_pos(1); abs_pos(2); abs_pos(4)];%JUST FOR GROUND TRUTH
 
     [x_est, P] = f_estimator(x_est, u_odometry, z, beacons_xy, P, dt, estimator_params);
     

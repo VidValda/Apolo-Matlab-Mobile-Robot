@@ -5,12 +5,12 @@ robotName = 'Marvin';
 laserName = 'LMS100';
 
 goal_poses = [
-    10,  10, 0;
-    18,  18, pi/2;
-    17,  3, pi/2;
-    25,  18.5, pi;
-    22,  3, 0;
-    32,  16.5, pi/2;
+    %10,  10, 0;
+    % 18,  18, pi/2;
+    % 17,  3, pi/2;
+    % 25,  18.5, pi;
+    % 22,  3, 0;
+    % 32,  16.5, pi/2;
     32,  5, pi/2;
     5.5,  5.5, pi;
 ];
@@ -125,9 +125,10 @@ switch ESTIMATOR_TYPE
     case 'EKF'
         % estimator_params.Q = diag([2.2188e-05,9.6568e-07]);
         % estimator_params.R = diag([2.5018e-04,3.7769e-04]);
-        estimator_params.Q = diag([2.2188e-05,9.6568e-07]);
-        estimator_params.R = diag([0.1,0.1]);
+        estimator_params.Q = diag([0.8366,0.0397]*1.0e-04*100);
+        estimator_params.R = diag([0.2452,0.4129]*1.0e-03*100);
         estimator_params.sensor_y_offset = sensor_y_offset;
+        estimator_params.correction_factor = 0.02;
         f_estimator = @ekf;
 end
 
