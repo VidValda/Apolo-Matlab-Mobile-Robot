@@ -3,33 +3,74 @@ clear; clc; close all;
 robotName = 'Marvin';
 dt = 0.1;
 
-start_x = 0;
-start_y = 2;
+start_x = 25;
+start_y = 9;
+start_theta = 0;
+
 correction_factor = 0.02;
 sensor_y_offset = 0.1; 
 
-apoloPlaceMRobot(robotName, [start_x, start_y, 0], 0);
+apoloPlaceMRobot(robotName, [start_x, start_y, 0], start_theta);
 apoloResetOdometry(robotName, [start_x, start_y, 0]);
 apoloUpdate();
 
-beacon_1_pos = [-3.9, 3.9];
-beacon_2_pos = [3.9, 3.9];
-beacons_pos_map = [beacon_1_pos; beacon_2_pos];
+beacons_pos_map = [
+    6.00,  7.00;
+    8.60, 11.00;
+    12.00, 9.80;
+    16.00, 7.00;
+    7.05,  8.55;
+    15.30, 2.15;
+    16.05, 15.65;
+    24.00, 9.65;
+    16.00, 12.00;
+    24.15, 12.00;
+    25.00, 15.65;
+    29.00, 9.00;
+    35.00, 10.00;
+    24.65, 7.25;
+    34.80, 7.25;
+    35.50, 12.10;
+    15.35, 4.95;
+    25.35, 4.95;
+    25.00, 2.15;
+    35.00, 4.25;
+    35.00, 2.35;
+    3.75,  12.00;
+    3.20,  18.10;
+    36.20, 17.45;
+    32.10, 17.65
+];
 
-pos_absolute_current = apoloGetLocationMRobot(robotName);
-pos_absolute_past = pos_absolute_current;
-pos_odometry_current = apoloGetOdometry(robotName);
-pos_odometry_past = pos_odometry_current;
 
-radio = 2;
-vueltas = 4;
-distanciatotal = 2*pi*radio;
-velocidadL = 0.2;
-numerodepasos = ceil(distanciatotal/(velocidadL*dt));
-velocidadA = -2*pi/(numerodepasos*dt);
-total_steps = ceil(numerodepasos * vueltas);
+%[v_ref (m/s), w_ref (rad/s), duración (s)]
+movimientos = [
+    0.4,  0.0,  10.0;
+    0.2,  0.5,  3.14/0.5;
+    0.4,  0.0,  10.0;
+    0.2, -0.5,  3.14/0.5;
+    0.3,  -0.5,  10.0;
+    0.0,  0.5,  4;
+];
 
-figure('Units', 'normalized', 'Position', [0.1 0.1 0.8 0.8]);
+repeticiones = 4; 
+U_sequence = [];
+
+for r = 1:repeticiones
+    for k = 1:size(movimientos, 1)
+        v_cmd = movimientos(k, 1);
+        w_cmd = movimientos(k, 2);
+        duracion = movimientos(k, 3);
+        
+        num_pasos_segmento = ceil(duracion / dt);
+        segmento = repmat([v_cmd, w_cmd], num_pasos_segmento, 1);
+        U_sequence = [U_sequence; segmento];
+    end
+end
+
+total_steps = size(U_sequence, 1);
+
+figure('Units', 'normalized', 'Position', [0.1 0.1 0.8 0.8], 'Name', 'Calibración Extendida');
 ax1 = subplot(4,2,1); title('Error v (m/s)'); grid on; h1 = animatedline(ax1, 'Color', 'r');
 ax2 = subplot(4,2,2); title('Histogram Error v'); grid on; h2 = histogram('FaceColor', 'b');
 ax3 = subplot(4,2,3); title('Error w (rad/s)'); grid on; h3 = animatedline(ax3, 'Color', 'k');
@@ -44,53 +85,54 @@ errors_w = zeros(total_steps, 1);
 errors_range = []; 
 errors_bearing = [];
 
+pos_absolute_current = apoloGetLocationMRobot(robotName);
+pos_absolute_past = pos_absolute_current;
+pos_odometry_current = apoloGetOdometry(robotName);
+pos_odometry_past = pos_odometry_current;
+
+fprintf('Iniciando calibración... Total pasos: %d\n', total_steps);
+
 for i = 1:total_steps
-    apoloMoveMRobot(robotName, [velocidadL, velocidadA], dt);
+    v_actual = U_sequence(i, 1);
+    w_actual = U_sequence(i, 2);
+    
+    apoloMoveMRobot(robotName, [v_actual, w_actual], dt);
     apoloUpdate();
     
     pos_odometry_current = apoloGetOdometry(robotName);
     pos_absolute_current = apoloGetLocationMRobot(robotName);
     
-    % --- Locomotion Error Analysis ---
     dx_odo = pos_odometry_current(1) - pos_odometry_past(1);
     dy_odo = pos_odometry_current(2) - pos_odometry_past(2);
     dtheta_odo = wrapToPi(pos_odometry_current(3) - pos_odometry_past(3));
-    
-    w_odo = dtheta_odo / dt;
-    dist_cuerda_odo = sqrt(dx_odo^2 + dy_odo^2);
-
-    if abs(dtheta_odo) > 1e-5
-        factor_correccion = (dtheta_odo / 2) / sin(dtheta_odo / 2);
-        dist_arco_odo = dist_cuerda_odo * factor_correccion;
-        
-        v_odo = dist_arco_odo / dt;
-    else
-        v_odo = dist_cuerda_odo / dt;
-    end
     
     dx_real = pos_absolute_current(1) - pos_absolute_past(1);
     dy_real = pos_absolute_current(2) - pos_absolute_past(2);
     dtheta_real = wrapToPi(pos_absolute_current(4) - pos_absolute_past(4));
     
-    w_real = dtheta_real / dt;
-    dist_cuerda = sqrt(dx_real^2 + dy_real^2);
+    w_odo_meas = dtheta_odo / dt;
+    w_real_meas = dtheta_real / dt;
+    
 
-    if abs(dtheta_real) > 1e-5
-        factor_correccion = (dtheta_real / 2) / sin(dtheta_real / 2);
-        dist_arco = dist_cuerda * factor_correccion;
-        
-        v_real = dist_arco / dt;
+    dist_cuerda_odo = sqrt(dx_odo^2 + dy_odo^2);
+    if abs(dtheta_odo) > 1e-5
+        factor = (dtheta_odo / 2) / sin(dtheta_odo / 2);
+        v_odo_meas = (dist_cuerda_odo * factor) / dt;
     else
-        v_real = dist_cuerda / dt;
+        v_odo_meas = dist_cuerda_odo / dt;
     end
     
-    err_v = v_real - v_odo;
-    err_w = w_real - w_odo;
+    dist_cuerda_real = sqrt(dx_real^2 + dy_real^2);
+    if abs(dtheta_real) > 1e-5
+        factor = (dtheta_real / 2) / sin(dtheta_real / 2);
+        v_real_meas = (dist_cuerda_real * factor) / dt;
+    else
+        v_real_meas = dist_cuerda_real / dt;
+    end
     
-    errors_v(i) = err_v;
-    errors_w(i) = err_w;
+    errors_v(i) = v_real_meas - v_odo_meas;
+    errors_w(i) = w_real_meas - w_odo_meas;
     
-    % --- Sensor Error Analysis ---
     beacons_reading = apoloGetLaserLandMarks('LMS100');
     
     x_real_robot = pos_absolute_current(1);
@@ -103,7 +145,7 @@ for i = 1:total_steps
     for j = 1:length(beacons_reading.id)
         id = beacons_reading.id(j);
         
-        if id <= size(beacons_pos_map, 1)
+        if id > 0 && id <= size(beacons_pos_map, 1)
             b_x = beacons_pos_map(id, 1);
             b_y = beacons_pos_map(id, 2);
             
@@ -133,10 +175,10 @@ for i = 1:total_steps
     pos_odometry_past = pos_odometry_current;
     pos_absolute_past = pos_absolute_current;
     
-    addpoints(h1, i, err_v);
-    addpoints(h3, i, err_w);
+    addpoints(h1, i, errors_v(i));
+    addpoints(h3, i, errors_w(i));
     
-    if mod(i, 10) == 0
+    if mod(i, 20) == 0
         h2.Data = errors_v(1:i);
         h4.Data = errors_w(1:i);
         h6.Data = errors_bearing;
@@ -150,12 +192,16 @@ var_w = var(errors_w);
 var_range = var(errors_range);
 var_bearing = var(errors_bearing);
 
-Q = diag([var_v, var_w]);
+tuning_Q = 1.0; 
+
+Q = diag([var_v, var_w]) * tuning_Q;
 R = diag([var_range, var_bearing]);
 
-fprintf('EKF Parameters:\n');
-fprintf('Q (Process Noise Covariance): \n'); disp(Q);
-fprintf('R (Measurement Noise Covariance): \n'); disp(R);
+fprintf('\n--- RESULTADOS DE CALIBRACIÓN ---\n');
+fprintf('Q (Ruido Proceso [v, w]):\n'); disp(Q);
+fprintf('R (Ruido Medida [range, bearing]):\n'); disp(R);
+fprintf('Varianza v: %.6f\n', var_v);
+fprintf('Varianza w: %.6f\n', var_w);
 
 save('stats_error_motores_odometria.mat', 'Q', 'R', 'correction_factor', 'sensor_y_offset');
-saveas(gcf, 'error_analysis_figure.png');
+saveas(gcf, 'calibration_results.png');

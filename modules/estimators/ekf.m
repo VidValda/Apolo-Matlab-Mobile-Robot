@@ -78,9 +78,8 @@ function [x_est,P] = ekf(x_est_prev, u, z, beacons_xy, P, dt, params)
         z_k_pred(i*2-1) = D;
         z_k_pred(i*2) = wrapTo2Pi(atan2(dy, dx) - theta_a);
 
-        grad_scaling = 1 - (params.correction_factor / D2);
 
-        H_k(i*2-1,:) = [-dx/D*grad_scaling, -dy/D*grad_scaling, (params.sensor_y_offset/D)*(dx*s_th-dy*c_th)*grad_scaling]; 
+        H_k(i*2-1,:) = [-dx/D, -dy/D, (params.sensor_y_offset/D)*(dx*s_th-dy*c_th)]; 
         H_k(i*2,:) = [dy/D2, -dx/D2, (-params.sensor_y_offset*(dx*c_th+dy*s_th)/D2)-1];        
     end
 
