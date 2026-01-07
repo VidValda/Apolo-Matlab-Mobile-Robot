@@ -29,6 +29,7 @@ A comprehensive mobile robot navigation system using MATLAB and the Apolo simula
 ### 1. Install Apolo
 
 1. Install Apolo (64-bit version compatible with Windows 10 and 64-bit MATLAB)
+   - Repository: https://github.com/mhernando/Apolo
 2. The installation creates the following structure:
    ```
    Apolo/
@@ -54,7 +55,7 @@ Alternatively, you can add it permanently:
 ### 3. Clone/Download This Project
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/VidValda/Apolo-Matlab-Mobile-Robot.git
 cd Apolo-Matlab-Mobile-Robot
 ```
 
@@ -106,7 +107,7 @@ Apolo-Matlab-Mobile-Robot/
 
 1. Open Apolo from the Windows Start Menu
 2. Load an environment XML file:
-   - Go to `File` → `Open Environment`
+   - Go to `File` → `Loas World XML`
    - Navigate to `Apolo/data/` or `models/` directory
    - Select an XML file (e.g., `Factory_Map_2026_G1.xml`)
 
