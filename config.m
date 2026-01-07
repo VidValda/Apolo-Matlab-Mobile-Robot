@@ -7,12 +7,12 @@ laserName = 'LMS100';
 goal_poses = [
     10,  10, 0;
     18,  18, pi/2;
-    17,  3, pi/2;
-    25,  18.5, pi;
-    22,  3, 0;
-    32,  16.5, pi/2;
-    32,  5, pi/2;
-    5.5,  5.5, pi;
+    %17,  3, pi/2;
+    %25,  18.5, pi;
+    %22,  3, 0;
+    %32,  16.5, pi/2;
+    %32,  5, pi/2;
+    %5.5,  5.5, pi;
 ];
 
 sensor_y_offset = 0.1;
@@ -25,7 +25,7 @@ planner_params.hold_time = 10;   % segundos de espera en cada goal (entre segmen
 Xmax = 40; 
 Ymax = 20;
 
-S = load('models/Factory_map_bin_2025_JCRY .mat'); % Cargar mapa de /model
+S = load('models/Factory_map_bin_2025_JCRY.mat'); % Cargar mapa de /model
 fn = fieldnames(S);
 bin = S.(fn{1});
 
@@ -125,8 +125,8 @@ switch ESTIMATOR_TYPE
     case 'EKF'
         % estimator_params.Q = diag([2.2188e-05,9.6568e-07]);
         % estimator_params.R = diag([2.5018e-04,3.7769e-04]);
-        estimator_params.Q = diag([0.2786,0.0818]*1.0e-03*1.5);
-        estimator_params.R = diag([2.2969,0.0127]*1.5);
+        estimator_params.Q = diag([0.2786,0.0818]*1.0e-03*3);
+        estimator_params.R = diag([2.2969,0.0127]*3);
         estimator_params.sensor_y_offset = sensor_y_offset;
         estimator_params.correction_factor = 0.02;
         f_estimator = @ekf;
@@ -135,31 +135,31 @@ end
 switch SENSOR_TYPE
     case 'BEACONS'
         sensor_params.beacons_pos = [
-            6.00,  7.00;
-            8.60, 11.00;
-            12.00, 9.80;
-            16.00, 7.00;
-            7.05,  8.55;
-            15.30, 2.15;
-            16.05, 15.65;
-            24.00, 9.65;
-            16.00, 12.00;
-            24.15, 12.00;
-            25.00, 15.65;
-            29.00, 9.00;
-            35.00, 10.00;
-            24.65, 7.25;
-            34.80, 7.25;
-            35.50, 12.10;
-            15.35, 4.95;
-            25.35, 4.95;
-            25.00, 2.15;
-            35.00, 4.25;
-            35.00, 2.35;
-            3.75,  12.00;
-            3.20,  18.10;
-            36.20, 17.45;
-            32.10, 17.65
+            8.60,  11.00;    % ID 1  (PARED_1)
+            12.00, 9.80;     % ID 2  (PARED_2)
+            16.00, 7.00;     % ID 3  (PARED_3)
+            20.00, 9.00;     % ID 4  (PARED_4)
+            7.05,  8.55;     % ID 5  (PARED_5)
+            15.30, 2.15;     % ID 6  (PARED_6)
+            16.05, 15.65;    % ID 7  (PARED_7)
+            24.00, 9.65;     % ID 8  (PARED_8)
+            16.00, 12.00;    % ID 9  (PARED_9)
+            24.15, 12.00;    % ID 10 (PARED_10)
+            25.00, 15.65;    % ID 11 (PARED_11)
+            29.00, 9.00;     % ID 12 (PARED_12)
+            35.00, 10.00;    % ID 13 (PARED_13)
+            24.65, 7.25;     % ID 14 (PARED_14)
+            34.80, 7.25;     % ID 15 (PARED_15)
+            35.50, 12.10;    % ID 16 (PARED_16)
+            15.35, 4.95;     % ID 17 (PARED_17)
+            25.35, 4.95;     % ID 18 (PARED_18)
+            25.20, 2.46;     % ID 19 (PARED_19)
+            35.00, 4.25;     % ID 20 (PARED_20)
+            35.00, 2.35;     % ID 21 (PARED_21)
+            3.75,  12.00;    % ID 22 (PARED_22)
+            3.20,  18.10;    % ID 23 (PARED_23)
+            36.20, 17.45;    % ID 24 (PARED_24)
+            32.10, 17.65     % ID 25 (PARED_25)
         ];
         sensor_params.correction_factor = 0.02;
         f_sensors = @beacons_sensor;
