@@ -25,7 +25,7 @@ planner_params.hold_time = 10;   % segundos de espera en cada goal (entre segmen
 Xmax = 40; 
 Ymax = 20;
 
-S = load('models/Factory_map_two_cone.mat'); % Cargar mapa de /model
+S = load('models/Factory_map_bin_2025_JCRY .mat'); % Cargar mapa de /model
 fn = fieldnames(S);
 bin = S.(fn{1});
 
@@ -125,8 +125,8 @@ switch ESTIMATOR_TYPE
     case 'EKF'
         % estimator_params.Q = diag([2.2188e-05,9.6568e-07]);
         % estimator_params.R = diag([2.5018e-04,3.7769e-04]);
-        estimator_params.Q = diag([0.2871,0.1084]*1.0e-03*20);
-        estimator_params.R = diag([0.0162,0.0013]*20);
+        estimator_params.Q = diag([0.2786,0.0818]*1.0e-03*1.5);
+        estimator_params.R = diag([2.2969,0.0127]*1.5);
         estimator_params.sensor_y_offset = sensor_y_offset;
         estimator_params.correction_factor = 0.02;
         f_estimator = @ekf;

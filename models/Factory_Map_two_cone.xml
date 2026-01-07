@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <root>
 	<World>
-		<WorldInfo name="" id="0"/>
+				<WorldInfo name="Robot Movil Para Inspeccion Industrial">
+			<RegisterNumber number="251568"/>
+			<RegisterNumber number="251852"/>
+			<RegisterNumber number="250803"/><!--gme-->
+		</WorldInfo>
 		<FaceSetPart name="Suelo" id="1">
 			<face>
 				<colour r="0.4" g="0.4" b="0.4"/>
@@ -308,7 +312,7 @@
 		</Pioneer3ATSim>
 		<LMS100Sim name="LMS100" id="23" linkTo="$Marvin$">
 			<position>
-				{0,0,0.4}
+				{0.1,0,0.4}
 			</position>
 			<colour r="0" g="1" b="0"/>
 		</LMS100Sim>
@@ -3600,12 +3604,12 @@
 			</position>
 		</ComposedEntity>
 
-
+<!-- 
 				<LandMark mark_id="1" name="PARED" id="73">
 			<position>
 				{6,7,0.2}
 			</position>
-		</LandMark>
+		</LandMark> -->
 		<!-- <LandMark mark_id="1" name="PARED_1" id="74">
 			<position>
 				{8.6,11,0.2}
@@ -3616,11 +3620,11 @@
 				{12,9.8,0.2}
 			</position>
 		</LandMark> -->
-		<LandMark mark_id="3" name="PARED_3" id="76">
+		<!-- <LandMark mark_id="3" name="PARED_3" id="76">
 			<position>
 				{16,7,0.2}
 			</position>
-		</LandMark>
+		</LandMark> -->
 		<!-- <LandMark mark_id="4" name="PARED_4" id="77">
 			<position>
 				{20,9,0.2}
@@ -3631,36 +3635,36 @@
 				{7.05,8.55,0.2}
 			</position>
 		</LandMark>
-		<LandMark mark_id="6" name="PARED_6" id="79">
+		<!-- <LandMark mark_id="6" name="PARED_6" id="79">
 			<position>
 				{15.3,2.15,0.2}
 			</position>
-		</LandMark>
-		<LandMark mark_id="7" name="PARED_7" id="80">
+		</LandMark> -->
+		<!-- <LandMark mark_id="7" name="PARED_7" id="80">
 			<position>
 				{16.05,15.65,0.2}
 			</position>
-		</LandMark>
+		</LandMark> -->
 		<!-- <LandMark mark_id="8" name="PARED_8" id="81">
 			<position>
 				{24,9.65,0.2}
 			</position>
 		</LandMark> -->
-		<LandMark mark_id="9" name="PARED_9" id="82">
+		<!-- <LandMark mark_id="9" name="PARED_9" id="82">
 			<position>
 				{16,12,0.2}
 			</position>
-		</LandMark>
-		<LandMark mark_id="10" name="PARED_10" id="83">
+		</LandMark> -->
+		<!-- <LandMark mark_id="10" name="PARED_10" id="83">
 			<position>
 				{24.15,12,0.2}
 			</position>
-		</LandMark>
-		<LandMark mark_id="11" name="PARED_11" id="84">
+		</LandMark> -->
+		<!-- <LandMark mark_id="11" name="PARED_11" id="84">
 			<position>
 				{25,15.65,0.2}
 			</position>
-		</LandMark>
+		</LandMark> -->
 		<!-- <LandMark mark_id="12" name="PARED_12" id="85">
 			<position>
 				{29,9,0.2}
@@ -3671,11 +3675,11 @@
 				{35,10,0.2}
 			</position>
 		</LandMark>
-		<LandMark mark_id="14" name="PARED_14" id="87">
+		<!-- <LandMark mark_id="14" name="PARED_14" id="87">
 			<position>
 				{24.65,7.25,0.2}
 			</position>
-		</LandMark>
+		</LandMark> -->
 		<LandMark mark_id="15" name="PARED_15" id="88">
 			<position>
 				{34.8,7.25,0.2}
@@ -3686,7 +3690,7 @@
 				{35.5,12.1,0.2}
 			</position>
 		</LandMark>
-		<LandMark mark_id="17" name="PARED_17" id="90">
+		<!-- <LandMark mark_id="17" name="PARED_17" id="90">
 			<position>
 				{15.35,4.95,0.2}
 			</position>
@@ -3695,12 +3699,12 @@
 			<position>
 				{25.35,4.95,0.2}
 			</position>
-		</LandMark>
-		<LandMark mark_id="19" name="PARED_19" id="92">
+		</LandMark> -->
+		<!-- <LandMark mark_id="19" name="PARED_19" id="92">
 			<position>
 				{25.2,2.46,0.2}
 			</position>
-		</LandMark>
+		</LandMark> -->
 		<LandMark mark_id="20" name="PARED_20" id="93">
 			<position>
 				{35,4.25,0.2}
@@ -3711,16 +3715,16 @@
 				{35,2.35,0.2}
 			</position>
 		</LandMark>
-		<LandMark mark_id="22" name="PARED_22" id="95">
+		<!-- <LandMark mark_id="22" name="PARED_22" id="95">
 			<position>
 				{3.75,12,0.2}
 			</position>
-		</LandMark>
-		<LandMark mark_id="23" name="PARED_23" id="96">
+		</LandMark> -->
+		<!-- <LandMark mark_id="23" name="PARED_23" id="96">
 			<position>
 				{3.2,18.1,0.2}
 			</position>
-		</LandMark>
+		</LandMark> -->
 		<LandMark mark_id="24" name="PARED_24" id="97">
 			<position>
 				{36.2,17.45,0.2}

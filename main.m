@@ -7,7 +7,8 @@ apoloResetOdometry(robotName, [5, 6, 0]);
 apoloUpdate();
 last_odo = apoloGetOdometry(robotName);
 
-x_est = [4; 5; 0.1];%estimación inicial desfasada
+x_est = [4.5; 5.5; 0.1];%estimación inicial desfasada
+%x_est = [5; 6; 0];
 
 P = diag([0.2,0.2,0.1]);
 [ref_data, full_path_xy] = mission_planner(f_planner, map, x_est, goal_poses, planner_params, dt);
