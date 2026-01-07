@@ -5,13 +5,13 @@ robotName = 'Marvin';
 laserName = 'LMS100';
 
 goal_poses = [
-    10,  10, 0;
-    18,  18, pi/2;
+    %10,  10, 0;
+    %18,  18, pi/2;
     %17,  3, pi/2;
     %25,  18.5, pi;
     %22,  3, 0;
     %32,  16.5, pi/2;
-    %32,  5, pi/2;
+    32,  5, pi/2;
     %5.5,  5.5, pi;
 ];
 
@@ -25,7 +25,7 @@ planner_params.hold_time = 10;   % segundos de espera en cada goal (entre segmen
 Xmax = 40; 
 Ymax = 20;
 
-S = load('models/Factory_map_bin_2025_JCRY.mat'); % Cargar mapa de /model
+S = load('models/Factory_map_no_cone.mat'); % Cargar mapa de /model
 fn = fieldnames(S);
 bin = S.(fn{1});
 
@@ -89,18 +89,18 @@ switch CONTROLLER_TYPE2
         % -------- Reactive (LaserData) params --------
         reactive_params.range_min = 0.05;
         reactive_params.range_max = 10.0;
-        reactive_params.w_escape = 1.2;   % giro fuerte en emergencia
+        reactive_params.w_escape = 0.8;   % giro fuerte en emergencia
 
         % LMS100 típico: ~270° y 541 medidas (depende de xml)
         % Si no estás segura, empieza con [-pi/2, pi/2] y ajusta
         reactive_params.ang_min = -3*pi/4;
         reactive_params.ang_max =  3*pi/4;
         
-        reactive_params.front_half_angle = deg2rad(35);  % +/- 20° frente
-        reactive_params.side_angle       = deg2rad(100);  % costados
+        reactive_params.front_half_angle = deg2rad(25);  % +/- 20° frente
+        reactive_params.side_angle       = deg2rad(120);  % costados
         
-        reactive_params.d_slow = 1.30;   % empieza a reaccionar
-        reactive_params.d_stop = 0.45;   % se para si está muy cerca
+        reactive_params.d_slow = 0.8;   % empieza a reaccionar
+        reactive_params.d_stop = 0.25;   % se para si está muy cerca
         
         reactive_params.v_slow = 0.15;  % velocidad "de seguridad"
         
@@ -110,10 +110,10 @@ switch CONTROLLER_TYPE2
         reactive_params.v_max = 0.6;    % ajusta a tu robot
         reactive_params.w_max = 1.8;
         
-        reactive_params.d_min = 0.80;      % 0.8 distancia mínima deseada (seguridad)
+        reactive_params.d_min = 0.85;      % 0.8 distancia mínima deseada (seguridad)
         
         
-        reactive_params.escape_steps = 12; % 12 pasos * dt=0.1 => 1.2s escapando
+        reactive_params.escape_steps = 6; % 12 pasos * dt=0.1 => 1.2s escapando
         reactive_params.v_back = -0.08;    % retroceso suave (m/s) para despegarse
         
 
