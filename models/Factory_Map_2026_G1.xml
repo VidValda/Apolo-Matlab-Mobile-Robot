@@ -3593,11 +3593,6 @@
 				{32,2,0}
 			</position>
 		</ComposedEntity>
-		<LandMark mark_id="1" name="PARED" id="70">
-			<position>
-				{6,7,0.2}
-			</position>
-		</LandMark>
 		<LandMark mark_id="1" name="PARED_1" id="71">
 			<position>
 				{8.6,11,0.2}
