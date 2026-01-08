@@ -14,7 +14,7 @@ apoloPlaceMRobot(robotName, [start_x, start_y, 0], start_theta);
 apoloResetOdometry(robotName, [start_x, start_y, 0]);
 apoloUpdate();
 
-sensor_params.beacons_pos = [
+beacons_pos_map = [
     8.60,  11.00;    % ID 1  (PARED_1)
     12.00, 9.80;     % ID 2  (PARED_2)
     16.00, 7.00;     % ID 3  (PARED_3)
