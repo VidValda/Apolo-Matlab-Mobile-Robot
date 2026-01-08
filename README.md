@@ -108,40 +108,10 @@ Apolo-Matlab-Mobile-Robot/
 1. Open Apolo from the Windows Start Menu
 2. Load an environment XML file:
    - Go to `File` → `Loas World XML`
-   - Navigate to `Apolo/data/` or `models/` directory
+   - Navigate to `models/` directory
    - Select an XML file (e.g., `Factory_Map_2026_G1.xml`)
 
-### 2. Environment XML Structure
-
-The XML file defines:
-
-- **WorldInfo**: World parameters and sensor variance settings
-- **Pioneer3ATSim**: The differential drive robot (named "Marvin" by default)
-- **LMS100Sim**: SICK LMS100 laser range finder
-- **LandMark**: Beacon positions in the world
-
-Key XML elements:
-
-```xml
-<WorldInfo>
-    <RegisterNumber number="12345678"/>  <!-- Student ID affects sensor variance -->
-</WorldInfo>
-
-<Pioneer3ATSim name="Marvin">
-    <!-- Robot physical properties -->
-</Pioneer3ATSim>
-
-<LMS100Sim name="LMS100" linkTo="$Marvin$">
-    <!-- Laser sensor configuration -->
-</LMS100Sim>
-
-<LandMark mark_id="1">
-    <position>{6.00, 7.00, 0}</position>
-    <!-- Beacon position in world coordinates -->
-</LandMark>
-```
-
-### 3. MATLAB Connection Test
+### 2. MATLAB Connection Test
 
 Before running the main code, verify the connection:
 
@@ -159,64 +129,11 @@ This opens a GUI to test:
 
 ---
 
-## Calibration
-
-The calibration process estimates the noise covariance matrices **Q** (process noise) and **R** (measurement noise) for the EKF.
-
-### Running Calibration
-
-```matlab
-cd tests/calibration
-calibration
-```
-
-### Calibration Process
-
-1. **Robot Movement Sequence**: The robot executes predefined movements:
-
-   - Forward motion at various speeds
-   - Rotations (left/right)
-   - Combined motions
-
-2. **Data Collection**:
-
-   - **Odometry Errors**: Compares commanded velocities (v, ω) with measured odometry
-   - **Sensor Errors**: Compares true beacon ranges/bearings with sensor readings
-
-3. **Variance Calculation**:
-
-   ```matlab
-   var_v = var(errors_v);        % Linear velocity variance
-   var_w = var(errors_w);        % Angular velocity variance
-   var_range = var(errors_range);    % Range measurement variance
-   var_bearing = var(errors_bearing); % Bearing measurement variance
-   ```
-
-4. **Covariance Matrices**:
-
-   ```matlab
-   Q = diag([var_v, var_w]) * tuning_factor;  % Process noise
-   R = diag([var_range, var_bearing]);        % Measurement noise
-   ```
-
-5. **Results**: Saved to `stats_error_motores_odometria.mat`
-
-### Calibration Parameters
-
-- **correction_factor**: Bias correction for range measurements (default: 0.02)
-- **sensor_y_offset**: Offset of sensor from robot center (default: 0.1 m)
-- **tuning_Q**: Scaling factor for process noise (default: 1.0)
-
-### Output
-
-- `calibration_results.png`: Visualization of error distributions
-- `stats_error_motores_odometria.mat`: Calibrated Q and R matrices
-
----
-
 ## Main Code Execution
 
 ### Quick Start
+
+Just run the main file.
 
 ```matlab
 main
