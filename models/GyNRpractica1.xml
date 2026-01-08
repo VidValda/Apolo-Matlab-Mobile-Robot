@@ -1,9 +1,10 @@
 <root>
   <World>
 	<!-- Los alumnos deben poner el número entero de su número de matrícula a continuación -->
-    <WorldInfo name="Guiado y Navegacion. MUAR. UPM 2018">
-		<RegisterNumber number="23454"/>
-		<RegisterNumber number="22354"/>
+    <WorldInfo name="Robot Movil Para Inspeccion Industrial">
+			<RegisterNumber number="251568"/>
+			<RegisterNumber number="251852"/>
+			<RegisterNumber number="250803"/><!--gme-->
 	</WorldInfo>
 	<!-- definición de una habitación como un conjunto de paredes -->
 <FaceSetPart name="Sala Cuadrada 8x8">

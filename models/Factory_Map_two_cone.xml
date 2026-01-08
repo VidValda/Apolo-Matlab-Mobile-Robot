@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <root>
 	<World>
-				<WorldInfo name="Robot Movil Para Inspeccion Industrial">
+		<WorldInfo name="Robot Movil Para Inspeccion Industrial">
 			<RegisterNumber number="251568"/>
 			<RegisterNumber number="251852"/>
 			<RegisterNumber number="250803"/><!--gme-->
