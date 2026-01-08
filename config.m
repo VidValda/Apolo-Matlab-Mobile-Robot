@@ -5,7 +5,7 @@ robotName = 'Marvin';
 laserName = 'LMS100';
 
 goal_poses = [
-    10,  10, 0;
+    %10,  10, 0;
     18,  18, pi/2;
     17,  3, pi/2;
     25,  18.5, pi;
