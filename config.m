@@ -25,7 +25,7 @@ planner_params.hold_time = 10;   % segundos de espera en cada goal (entre segmen
 Xmax = 40; 
 Ymax = 20;
 
-S = load('models/Factory_map_no_cone.mat'); % Cargar mapa de /model
+S = load('models/Factory_map_all_cone.mat'); % Cargar mapa de /model
 fn = fieldnames(S);
 bin = S.(fn{1});
 
